@@ -42,18 +42,24 @@ class IsarGenerator extends Generator {
         generated,
         embedded,
         imports,
+        buildStep,
         collection: true,
       );
     }
 
     // Generate embedded classes AFTER collection classes.
     for (final element in embedded) {
+      if (element.library.uri != library.element.uri) {
+        continue; // only generate if it is on same file/library
+      }
+
       _generateClass(
         element,
         body,
         generated,
         embedded,
         imports,
+        buildStep,
         collection: false,
       );
     }
@@ -82,7 +88,8 @@ class IsarGenerator extends Generator {
     StringBuffer output,
     Set<String> generated,
     List<ClassElement> embedded,
-    Set<String> imports, {
+    Set<String> imports,
+    BuildStep buildStep, {
     required bool collection,
   }) {
     final className = '${element.name}Isar';
@@ -98,7 +105,7 @@ class IsarGenerator extends Generator {
     output.writeln('class $className {');
 
     for (final parameter in constructor.formalParameters) {
-      final fieldType = _fieldType(parameter, embedded, imports);
+      final fieldType = _fieldType(parameter, embedded, imports, buildStep);
 
       final nullable =
           parameter.type.nullabilitySuffix != NullabilitySuffix.none;
@@ -120,6 +127,7 @@ class IsarGenerator extends Generator {
     FormalParameterElement parameter,
     List<ClassElement> embedded,
     Set<String> imports,
+    BuildStep buildStep,
   ) {
     final type = parameter.type;
 
@@ -131,21 +139,56 @@ class IsarGenerator extends Generator {
 
       final itemType = type.typeArguments.first;
 
-      return 'List<${_resolveType(itemType, parameter, embedded, imports)}>${_nullableSuffix(type)}';
+      return 'List<${_resolveType(itemType, parameter, embedded, imports, buildStep)}>${_nullableSuffix(type)}';
     }
 
-    return _resolveType(type, parameter, embedded, imports);
+    return _resolveType(type, parameter, embedded, imports, buildStep);
   }
 
-  void _addImport(Element element, Set<String> imports) {
+  void _addImport(
+    Element element,
+    BuildStep buildStep,
+    Set<String> imports, {
+    bool generated = true,
+  }) {
     final uri = element.library?.uri;
 
-    if (uri == null) return;
+    if (uri == null || uri.scheme == 'dart') return;
 
-    // Don't import dart: libraries.
-    if (uri.scheme == 'dart') return;
+    if (!generated) {
+      imports.add(uri.toString());
+      return;
+    }
 
-    imports.add(uri.toString());
+    if (uri.scheme != 'package') return;
+
+    final parts = uri.path.split('/');
+    if (parts.length < 2) return;
+
+    final sourceRelativePath = parts.sublist(1).join('/');
+
+    final generatedRelativePath = sourceRelativePath.replaceFirst(
+      RegExp(r'\.dart$'),
+      '.isar.dart',
+    );
+
+    final outputDir = 'lib/generated/isar';
+
+    final generatedPath = p.join(outputDir, generatedRelativePath);
+
+    final currentRelativePath = p.relative(buildStep.inputId.path, from: 'lib');
+
+    final currentGeneratedPath = p.join(
+      outputDir,
+      currentRelativePath.replaceFirst(RegExp(r'\.dart$'), '.isar.dart'),
+    );
+
+    final importPath = p.relative(
+      generatedPath,
+      from: p.dirname(currentGeneratedPath),
+    );
+
+    imports.add(importPath.startsWith('.') ? importPath : './$importPath');
   }
 
   String _resolveType(
@@ -153,10 +196,11 @@ class IsarGenerator extends Generator {
     FormalParameterElement parameter,
     List<ClassElement> embedded,
     Set<String> imports,
+    BuildStep buildStep,
   ) {
     // Enum → keep the original enum.
     if (type is InterfaceType && type.element is EnumElement) {
-      _addImport(type.element, imports);
+      _addImport(type.element, buildStep, imports, generated: false);
       return type.getDisplayString();
     }
 
@@ -164,7 +208,7 @@ class IsarGenerator extends Generator {
     if (type is InterfaceType &&
         type.element is ClassElement &&
         _isPrimitive(type.element as ClassElement)) {
-      _addImport(type.element, imports);
+      _addImport(type.element, buildStep, imports);
       return type.getDisplayString();
     }
 
@@ -172,7 +216,7 @@ class IsarGenerator extends Generator {
     if (type is InterfaceType && type.element is ClassElement) {
       final classElement = type.element as ClassElement;
 
-      _addImport(classElement, imports);
+      _addImport(type.element, buildStep, imports);
 
       if (!_isEmbedded(parameter)) {
         throw InvalidGenerationSourceError(

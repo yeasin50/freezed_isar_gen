@@ -8,13 +8,9 @@ environment:
 
 # Add regular dependencies here.
 dependencies:
-  analyzer: ^14.4.0
-  build: ^4.0.11
-  path: ^1.9.1
-  source_gen: ^4.3.0
-  # path: ^1.9.0
+  analyzer: ^12.0.0
+  build: ^4.0.0
+  source_gen: ^4.2.4
 
 dev_dependencies:
-  build_runner: ^2.16.1
-  lints: ^6.0.0
-  test: ^1.25.6
+  build_runner: ^2.15.0

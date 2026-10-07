@@ -75,3 +75,68 @@ targets:
 ```
 
 This allows the generator to scan multiple directories and keep the generated Isar classes in a dedicated location.
+
+## example
+
+`user.dart`
+
+```dart
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:isar_community/isar.dart';
+
+import 'package:freezed_isar_gen/freezed_isar_gen.dart';
+
+part 'user.freezed.dart';
+
+@GenerateIsar()
+@freezed
+abstract class User with _$User {
+  const factory User({
+    required String id,
+    required String name,
+    String? email,
+    @Enumerated(.name) UserStatus? status,
+    @IsarEmbedded() Profile? profile,
+
+    List<String>? tags,
+
+    @IsarEmbedded() List<Profile>? profiles,
+  }) = _User;
+}
+
+enum UserStatus { active, inactive }
+
+@freezed
+abstract class Profile with _$Profile {
+  const factory Profile({required String avatar}) = _Profile;
+}
+```
+
+This will generate freezed and `user.isar.dart`
+
+```dart
+// GENERATED CODE
+
+import 'package:isar_community/isar.dart';
+
+import 'package:test_isar_class_gen/user.dart';
+
+part 'user.g.dart';
+
+@collection
+class UserIsar {
+  late String id;
+  late String name;
+  String? email;
+  @Enumerated(EnumType.name)
+  UserStatus? status;
+  ProfileIsar? profile;
+  List<String>? tags;
+  List<ProfileIsar>? profiles;
+}
+
+@embedded
+class ProfileIsar {
+  late String avatar;
+}
+```
