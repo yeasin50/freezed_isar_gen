@@ -4,34 +4,38 @@ import 'package:source_gen/source_gen.dart';
 import 'generator.dart';
 
 Builder isarBuilder(BuilderOptions options) {
-  return IsarBuilder();
+  return IsarBuilder(
+    outputDir: options.config['output_dir'] as String? ?? 'lib/generated/isar',
+  );
 }
 
 class IsarBuilder implements Builder {
-  const IsarBuilder();
+  final String outputDir;
+
+  const IsarBuilder({required this.outputDir});
 
   @override
   Map<String, List<String>> get buildExtensions => {
-    '^lib/{{}}.dart': ['lib/generated/isar/{{}}.isar.dart'],
+    '^lib/{{}}.dart': ['$outputDir/{{}}.isar.dart'],
   };
 
   @override
   Future<void> build(BuildStep buildStep) async {
     final library = await buildStep.resolver.libraryFor(buildStep.inputId);
 
-    final reader = LibraryReader(library);
-    final generator = IsarGenerator();
-
-    final output = generator.generate(reader, buildStep);
+    final output = IsarGenerator().generate(LibraryReader(library), buildStep);
 
     if (output.trim().isEmpty) {
       return;
     }
 
-    final outputId = AssetId(
-      buildStep.inputId.package,
-      'lib/generated/isar/${buildStep.inputId.path.substring('lib/'.length).replaceFirst('.dart', '.isar.dart')}',
-    );
+    final inputPath = buildStep.inputId.path;
+    final relativePath = inputPath.substring('lib/'.length);
+
+    final outputPath =
+        '$outputDir/${relativePath.replaceFirst('.dart', '.isar.dart')}';
+
+    final outputId = AssetId(buildStep.inputId.package, outputPath);
 
     await buildStep.writeAsString(outputId, output);
   }
