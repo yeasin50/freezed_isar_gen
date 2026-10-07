@@ -1,0 +1,20 @@
+name: freezed_isar_gen
+description: To generate isar class from freezed.
+version: 0.1.0
+# repository: https://github.com/my_org/my_repo
+
+environment:
+  sdk: ^3.13.4
+
+# Add regular dependencies here.
+dependencies:
+  analyzer: ^14.4.0
+  build: ^4.0.11
+  path: ^1.9.1
+  source_gen: ^4.3.0
+  # path: ^1.9.0
+
+dev_dependencies:
+  build_runner: ^2.16.1
+  lints: ^6.0.0
+  test: ^1.25.6

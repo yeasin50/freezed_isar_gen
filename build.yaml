@@ -1,0 +1,8 @@
+builders:
+  freezed_isar_gen:
+    import: "package:freezed_isar_gen/src/freezed_isar_gen_base.dart"
+    builder_factories: ["isarBuilder"]
+    build_extensions:
+      "^lib/{{}}.dart": ["lib/generated/isar/{{}}.isar.dart"]
+    auto_apply: none
+    build_to: source
