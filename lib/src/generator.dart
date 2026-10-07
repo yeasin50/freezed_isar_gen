@@ -10,7 +10,7 @@ import 'annotation.dart';
 import 'default_value_parser.dart';
 
 class IsarGenerator extends Generator with ClassParser {
-  static const _generateIsarChecker = TypeChecker.typeNamed(GenerateIsar);
+  static const _generateIsarChecker = TypeChecker.typeNamed(IsarGenerate);
 
   static const _embeddedChecker = TypeChecker.typeNamed(IsarEmbedded);
 

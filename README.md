@@ -1,5 +1,11 @@
 # Generate Isar Classes from Freezed Classes
 
+> This is for an old _specific_ project. You may fork it and increase the dependencies.
+> Or maybe I’ll create some versions if I need it again.
+> The way I use it is to create a separate branch and cherry-pick only those generated files, not the domain.
+> This will keep the boring tasks away, and I’ll review and tweak things as needed.
+> I had no intention of making this public for issues.
+
 The approach is to keep the **domain classes** as the source of truth and
 generate the corresponding **Isar classes** from them.
 
@@ -14,30 +20,52 @@ using [Isar CE](https://isar-community.dev/v3/tutorials/quickstart.html)as the l
 1. add dependencies into your `pubspec.yaml`
 
 ```yaml
+freezed_isar_gen:
+  git:
+    url: https://github.com/yeasin50/freezed_isar_gen.git
+```
+
+<details> <summary> in case you want </summary>
+
+```yaml
+name: domain
+description: "Pure entity of the app class"
+version: 0.0.1
+resolution: workspace
+homepage:
+
 environment:
-  sdk: ^3.13.4
+sdk: ^3.10.1
+flutter: ">=1.17.0"
 
 dependencies:
-  flutter:
-    sdk: flutter
-  cupertino_icons: ^1.0.8
+flutter:
+sdk: flutter
+http: ^1.6.0
+freezed_annotation: ^3.1.0
+json_annotation: ^4.9.0
 
-  build_runner: ^2.16.1
-  freezed: ^4.0.2
-  isar_community: ^3.3.2
+core:
+path: ./../core
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
+flutter_test:
+sdk: flutter
 
-  flutter_lints: ^6.0.0
-  freezed_isar_gen:
-    git:
-      url: https://github.com/yeasin50/freezed_isar_gen.git
+build_runner: any
+slang_build_runner: any
 
-flutter:
-  uses-material-design: true
+flutter_lints: ^5.0.0
+freezed: ^3.2.3
+json_serializable: ^6.7.1
+
+freezed_isar_gen:
+git:
+url: https://github.com/yeasin50/freezed_isar_gen.git
+isar_community: ^3.3.2
 ```
+
+</details>
 
 2. Enable the generator
 
@@ -88,7 +116,7 @@ import 'package:freezed_isar_gen/freezed_isar_gen.dart';
 
 part 'user.freezed.dart';
 
-@GenerateIsar()
+@IsarGenerate()
 @freezed
 abstract class User with _$User {
   const factory User({

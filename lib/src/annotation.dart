@@ -1,5 +1,5 @@
-class GenerateIsar {
-  const GenerateIsar();
+class IsarGenerate {
+  const IsarGenerate();
 }
 
 class IsarEmbedded {
