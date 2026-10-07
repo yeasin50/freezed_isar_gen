@@ -35,34 +35,34 @@ resolution: workspace
 homepage:
 
 environment:
-sdk: ^3.10.1
-flutter: ">=1.17.0"
+  sdk: ^3.10.1
+  flutter: ">=1.17.0"
 
 dependencies:
-flutter:
-sdk: flutter
-http: ^1.6.0
-freezed_annotation: ^3.1.0
-json_annotation: ^4.9.0
+  flutter:
+    sdk: flutter
+  http: ^1.6.0
+  freezed_annotation: ^3.1.0
+  json_annotation: ^4.9.0
 
-core:
-path: ./../core
+  core:
+    path: ./../core
 
 dev_dependencies:
-flutter_test:
-sdk: flutter
+  flutter_test:
+    sdk: flutter
 
-build_runner: any
-slang_build_runner: any
+  build_runner: any
+  slang_build_runner: any
 
-flutter_lints: ^5.0.0
-freezed: ^3.2.3
-json_serializable: ^6.7.1
+  flutter_lints: ^5.0.0
+  freezed: ^3.2.3
+  json_serializable: ^6.7.1
 
-freezed_isar_gen:
-git:
-url: https://github.com/yeasin50/freezed_isar_gen.git
-isar_community: ^3.3.2
+  freezed_isar_gen:
+    git:
+      url: https://github.com/yeasin50/freezed_isar_gen.git
+  isar_community: ^3.3.2
 ```
 
 </details>
