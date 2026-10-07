@@ -31,8 +31,9 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^6.0.0
-  isar_class_gen:
-    path: /home/yeasin/github/freezed_isar_gen
+  freezed_isar_gen:
+    git:
+      url: https://github.com/yeasin50/freezed_isar_gen.git
 
 flutter:
   uses-material-design: true

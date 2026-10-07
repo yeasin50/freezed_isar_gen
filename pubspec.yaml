@@ -1,7 +1,7 @@
 name: freezed_isar_gen
 description: To generate isar class from freezed.
 version: 0.1.0
-# repository: https://github.com/my_org/my_repo
+repository: https://github.com/yeasin50/freezed_isar_gen
 
 environment:
   sdk: ^3.13.4
