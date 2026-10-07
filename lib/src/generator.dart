@@ -7,8 +7,9 @@ import 'package:source_gen/source_gen.dart';
 import 'package:path/path.dart' as p;
 
 import 'annotation.dart';
+import 'default_value_parser.dart';
 
-class IsarGenerator extends Generator {
+class IsarGenerator extends Generator with ClassParser {
   static const _generateIsarChecker = TypeChecker.typeNamed(GenerateIsar);
 
   static const _embeddedChecker = TypeChecker.typeNamed(IsarEmbedded);
@@ -83,6 +84,23 @@ class IsarGenerator extends Generator {
     return type is InterfaceType && type.element is EnumElement;
   }
 
+  String? _defaultValue(FormalParameterElement parameter) {
+    for (final annotation in parameter.metadata.annotations) {
+      if (annotation.element?.enclosingElement?.name == 'Default') {
+        final source = annotation.toSource();
+
+        final start = source.indexOf('(');
+        final end = source.lastIndexOf(')');
+
+        if (start != -1 && end > start) {
+          return source.substring(start + 1, end).trim();
+        }
+      }
+    }
+
+    return null;
+  }
+
   void _generateClass(
     ClassElement element,
     StringBuffer output,
@@ -114,8 +132,11 @@ class IsarGenerator extends Generator {
         output.writeln('  @Enumerated(EnumType.name)');
       }
 
+      final defaultValue = _defaultValue(parameter);
+
       output.writeln(
-        '  ${nullable ? '' : 'late '}$fieldType ${parameter.name};',
+        '  ${nullable ? '' : 'late '}$fieldType ${parameter.name}'
+        '${defaultValue != null ? ' = $defaultValue' : ''};',
       );
     }
 
